@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575393172282.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4261199870",
+    "id" : "9C25B901",
+    "lastKnownWriteTime" : 1575190201,
+    "last_content_update" : 1575190201,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/helper/load_results.R",
+    "project_path" : "R/helper/load_results.R",
+    "properties" : {
+        "cursorPosition" : "15,50",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574065300699.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1425355952",
+    "id" : "EC248875",
+    "lastKnownWriteTime" : 1574103241,
+    "last_content_update" : 1574103241533,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/preprocess/run_preprocessRNA.R",
+    "project_path" : "R/preprocess/run_preprocessRNA.R",
+    "properties" : {
+        "cursorPosition" : "23,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 14,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

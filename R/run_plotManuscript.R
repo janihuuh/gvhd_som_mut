@@ -1,0 +1,175 @@
+
+
+#### Numbers
+gvhd$cluster <- Idents(gvhd)
+
+gvhd@meta.data %>% group_by(pathological_clonotype) %>% summarise(n = n()) %>% mutate(prop = n /sum(n))
+gvhd@meta.data %>% group_by(pathological_clonotype, timepoint) %>% summarise(n = n()) %>% mutate(prop = n /sum(n))
+gvhd@meta.data %>% group_by(pathological_clonotype, timepoint) %>% summarise(n = n()) %>% mutate(prop = n /sum(n))
+gvhd@meta.data %>% group_by(pathological_clonotype, cluster) %>% summarise(n = n()) %>% mutate(prop = n /sum(n))
+
+
+
+dir.create("results/manuscript/", showWarnings = F)
+
+ms_seurat <- gvhd
+Idents(ms_seurat) <- factor(getClusterPhenotypes(Idents(gvhd)), levels = c("Cytotoxic anti-apoptotic", "Cytotoxic effector", "Cytotoxic memory", "Naive", "Regulatory", "Cycling"))
+
+
+
+## Main UMAP-plot
+umap_df   <- data.frame(ms_seurat@reductions$umap@cell.embeddings, "cluster" = Idents(ms_seurat))
+umap_mean <- data.frame(aggregate(UMAP_1 ~ cluster, umap_df, median), UMAP_2 = aggregate(UMAP_2 ~ cluster, umap_df, median)[,2])
+
+cluster_perc <- umap_df %>% group_by(cluster) %>% summarise(n = n()) %>% mutate(prop = n/sum(n)) %>% mutate(prop = paste0(cluster, " ", round(prop, 3)*100, "%"))
+umap_mean    <- umap_mean %>% left_join(cluster_perc, by = "cluster") %>% select(-cluster) %>% dplyr::rename("cluster" = "prop")
+
+ggplot() +
+  geom_point(data = umap_df, aes(x = UMAP_1, y = UMAP_2, color = cluster), size = 1) +
+  ggrepel::geom_label_repel(data = umap_mean, aes(x = UMAP_1, y = UMAP_2, color = cluster, label = cluster), size = 8, color = "black") +
+  scale_color_manual(values = getPalette(7)) +
+  theme_void() + theme(legend.position = "none")
+ggsave("results/manuscript/1_umap_clusters.pdf", width = 8, height = 6)
+
+
+
+
+
+
+## Dotplot for manu
+antiapo_genes     <- c("KLRB1", "DUSP2")
+cytotoxic_genes   <- c("PRF1", "GZMA", "GZMB", "GNLY", "CD8A")
+reg_genes         <- c("FOXP3", "IL2RA")
+naive_genes       <- c("SELL", "LEF1")
+tf_genes          <- c("ZNF683")
+cm_genes          <- c("PDCD1", "LAG3")
+tem_genes         <- c("GZMK")
+
+markers <- c(antiapo_genes, cytotoxic_genes, naive_genes, tf_genes, cm_genes, tem_genes, reg_genes)
+
+DotPlot(ms_seurat, features = rev(markers), cols = "RdYlBu") + labs(x = "", y = "cluster") + # theme_void() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 20)) +
+  theme(axis.text.y = element_text(face = "italic", size = 20)) + coord_flip() + labs(y = "")
+ggsave("results/manuscript/2_dotplot.pdf", width = 8, height = 10)
+
+
+
+## Feature plot
+a <- FeaturePlot(ms_seurat, features = c("GZMA", "GZMB", "PRF1", "GNLY", "IFNG"), label = F, repel = F, cols = c("gray90", "tomato"), ncol = 5, combine=T)
+ggsave(plot = a, "results/manuscript/3a_featureplot.png", width = 20, height = 4)
+
+b <- FeaturePlot(cd4_tenx, features = c("GZMA", "GZMB", "PRF1", "GNLY", "IFNG"), label = F, repel = F, cols = c("gray90", "tomato"), ncol = 5, combine=T)
+ggsave(plot = b, "results/manuscript/3b_featureplot_healthy.png", width = 20, height = 4)
+
+
+
+## Where the expanded clonotype is
+gvhd$big_clonotype <- "other clonotype"
+gvhd$big_clonotype[gvhd$new_clonotypes_id %in% c("gvhd_clonotype1")] <- "clonotype with TCRab"
+gvhd$big_clonotype[gvhd$new_clonotypes_id %in% c("gvhd_clonotype2")] <- "clonotype with TCRb"
+gvhd$big_clonotype[gvhd$new_clonotypes_id %in% c("gvhd_clonotype3")] <- "clonotype with TCRa"
+gvhd$big_clonotype <- factor(gvhd$big_clonotype, levels = c("clonotype with TCRab", "clonotype with TCRb", "clonotype with TCRa", "other clonotype"))
+
+DimPlot(gvhd, reduction = "umap", group.by = "big_clonotype", label = T, repel = T, split.by = "big_clonotype", cols = getPalette(4)) + theme(legend.position = "none")
+ggsave("results/manuscript/umap_different_clonotypes.pdf", width = 14, height = 4)
+
+
+ms_seurat$pathological_clonotype[ms_seurat$pathological_clonotype == "no"] <- "mTORwt clonotype"
+ms_seurat$pathological_clonotype[ms_seurat$pathological_clonotype == "mTORmy clonotype"] <- "mTORmt clonotype"
+DimPlot(ms_seurat, group.by = "pathological_clonotype",  cols = c("darkred", "darkgrey"), pt.size = 0.7, order = T) + theme_void() + add_guide
+
+
+
+umap_df   <- data.frame(ms_seurat@reductions$umap@cell.embeddings, ms_seurat@meta.data, "cluster" = Idents(ms_seurat))
+umap_mean <- data.frame(aggregate(UMAP_1 ~ cluster, umap_df, median), UMAP_2 = aggregate(UMAP_2 ~ cluster, umap_df, median)[,2])
+
+ggplot() +
+  geom_point(data = umap_df, aes(x = UMAP_1, y = UMAP_2, color = pathological_clonotype), size = 1) +
+  stat_ellipse(data = subset(umap_df, pathological_clonotype == "mTORmt clonotype"), aes(x = UMAP_1, y = UMAP_2), size = 1, linetype = "dotted", color = "darkred") +
+  ggrepel::geom_label_repel(data = umap_mean, aes(x = UMAP_1, y = UMAP_2, color = cluster, label = cluster), size = 8, color = "black") +
+  scale_color_manual(values = c("darkred", "darkgrey")) +
+  theme_void() + guides(colour = guide_legend(override.aes = list(shape = 15))) + add_guide + labs(color = "") + theme(legend.text=element_text(size=15))
+ggsave("results/manuscript/4_umap_clonotype_of_itnerest.pdf", width = 10, height = 6)
+
+
+ms_seurat@meta.data %>% mutate(cluster = Idents(ms_seurat)) %>% group_by(pathological_clonotype, cluster) %>%
+  summarise(n = n()) %>% mutate(prop = n / sum(n)) %>%
+
+  ggplot(aes(cluster, prop, fill = pathological_clonotype)) + geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("darkred", "darkgrey")) + theme_bw() + labs(x = "", y = "proportion of cells in group") + ylim(values = c(0,1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave("results/manuscript/bar_clonotype_of_interest_umap.pdf", width = 7, height = 4)
+
+
+ 
+
+
+
+## Volcano plot
+cluster_markers <- fread("results/mutated_clonotype/cluster_markers_clonotype.txt")
+clonality_genes <- getClonalityGenes(gvhd)
+unwanted_genes  <- getUnwantedGenes(gvhd)
+
+genes <- c("GZMK"  ,   "KLRB1",    "DUSP2",    "EEF1A1",   "CCL5",     "GNLY",     "LGALS1",     "ZNF683" ,  "GZMB",     "FGFBP2",   "GZMH",
+           "LTB"   ,   "DUSP1",    "JUN",     "CCL4",     "EEF1B2" ,   "ZFP36L2",     "CD69",     "MYC",      "NFKBIA",    "TCF7",
+           "EOMES" ,     "NKG7",  "KLRD1",    "EIF1"   )
+
+ggplot() +
+  geom_point(data = subset(cluster_markers, p_val_adj > 0.05), aes(avg_logFC, -log10(p_val)), shape = 21, color = "lightgrey", alpha = 0.8) +
+  geom_point(data = subset(cluster_markers, p_val_adj < 0.05), aes(avg_logFC, -log10(p_val), color = direction)) +
+  # ggrepel::geom_label_repel(data  = subset(cluster_markers, p_val_adj < 1e-100 & !gene %in% clonality_genes & !gene %in% unwanted_genes),
+  #                           aes(avg_logFC, -log10(p_val), label = gene, color = direction), vjust = 2, size = 5) +
+  ggrepel::geom_label_repel(data  = subset(cluster_markers, gene %in% genes),
+                            aes(avg_logFC, -log10(p_val), label = gene, color = direction), vjust = 2, size = 5) +
+  # ggrepel::geom_label_repel(data  = subset(cluster_markers, p_val_adj < 1e-45 & !gene %in% clonality_genes)), aes(avg_logFC, -log(p_val, base = 100), label = gene, color = direction), vjust = 2) +
+
+  scale_color_manual(values = c("darkgrey", "darkred")) + # scale_y_log10() +
+  labs(x = "average log(fold-change)", y = "-log10(pval)") +
+  theme_bw() + theme(legend.position = "none") + xlim(values = c(-2, 2)) +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text.x = element_text(size = 20)) +
+  theme(axis.text.y = element_text(size = 20))
+ggsave("results/manuscript/5_volcanoplot_clonotype_markers.pdf", width = 8, height = 6)
+
+
+
+
+
+
+## Run plot supplementary
+DimPlot(ms_seurat, reduction = "umap", group.by = "timepoint", label = F, repel = T, cols = getPalette(10)[c(3,8)], pt.size = 0.7) + theme_void() + labs(fill = "time point") + add_guide + theme(legend.text=element_text(size=15))
+ggsave("results/manuscript/suppl0_umap_timepoints.pdf", width = 10, height = 6)
+
+calculateFoldchange_2v1(ms_seurat) %>% plotBarFoldchange + labs(y = "log2(fold-change)") +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text.x = element_text(size = 20)) +
+  theme(axis.text.y = element_text(size = 20)) + add_guide + theme(legend.text=element_text(size=15))
+ggsave("results/manuscript/suppl1_bar_timepoint_change_2_v_1.png", width = 12, height = 6)
+
+melt(table(Idents(ms_seurat))) %>%
+  ggplot(aes(as.factor(reorder(Var1, value)), value, label = value, fill = as.factor(Var1), label = value)) +
+  geom_bar(stat = "identity", color = "lightgrey") + geom_text() +
+  scale_fill_manual(values = getPalette(nClusters)) +
+  theme_minimal() + theme_bw() + theme(legend.position = "none") + coord_flip() + labs(x = "", y = "nCells") +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text.x = element_text(size = 20)) +
+  theme(axis.text.y = element_text(size = 20))
+
+ggsave("results/manuscript/suppl2_bar_cluster.png", width = 10, height = 6)
+
+
+## Pie chart the clusters
+melt(table(Idents(ms_seurat))) %>% mutate(prop = round(value/sum(value), 3)) %>%
+  ggplot(aes(x = factor(1), y = value/sum(value), label = prop, fill = as.factor(Var1))) +
+  geom_bar(stat = "identity", color = "lightgrey") +
+  scale_fill_manual(values = getPalette(nClusters)) +
+  theme_minimal() +
+  labs(x = "", y = "", fill = "Clusters") +
+  # geom_text(aes(x = factor(1), y= cumsum(prop) - prop/2, size = 6)) +
+  coord_polar(theta = "y")  +
+  theme(axis.title = element_text(size = 20)) +
+  theme(axis.text.x = element_text(size = 20)) +
+  theme(axis.text.y = element_text(size = 20)) + add_guide + theme(legend.text=element_text(size=15))
+ggsave("results/manuscript/suppl3_pie_cluster.png", width = 8, height = 8)
+
+melt(table(Idents(ms_seurat))) %>% mutate(prop = round(value/sum(value), 3)) %>% write.table("results/manuscript/pie_table.txt", sep = "\t", quote = F, row.names = F)

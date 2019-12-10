@@ -1,0 +1,115 @@
+
+
+####################
+
+scale_factor = 10e3     ## Scaling factor
+n_hvgs       = 3000     ## How many HVGs to calculate (minus the clonality and unwanted variation genes)
+n_pc_stdev   = 1.5      ## The minimun stdev value for PC to be accepted
+res          = c(seq(0.1, 1, 0.1), seq(1.2, 2, 0.2), 2.5, 3)
+
+####################
+
+## Init output options
+output_dir       <- paste0("results/hvg/")
+dir.create(output_dir, showWarnings = F)
+
+## Normalize
+gvhd_tcr <- NormalizeData(gvhd_tcr, normalization.method = "LogNormalize", scale.factor = scale_factor)
+
+## ==== Find HVGs with Seurat
+gvhd_tcr   <- FindVariableFeatures(gvhd_tcr, selection.method = "vst", nfeatures = 1e3)
+seurat_hvg <- VariableFeatures(gvhd_tcr)
+
+## Remove clonality and unwanted genes
+clonality_genes <- getClonalityGenes(gvhd_tcr)
+unwanted_genes  <- getUnwantedGenes(gvhd_tcr)
+
+seurat_hvg      <- seurat_hvg[!seurat_hvg %in% clonality_genes]
+seurat_hvg      <- seurat_hvg[!seurat_hvg %in% unwanted_genes]
+write.table(seurat_hvg, paste0(output_dir, "seurat_hvg.txt"), sep = "\t", quote = F, row.names = F)
+
+
+## Visualize the HVG function
+VariableFeatures(gvhd_tcr) <- seurat_hvg
+
+p <- plotSeuratHVG(gvhd_tcr, top_n = 50)
+ggsave(plot = p, paste0(output_dir, "seurat_hvg.png"), width = 8, height = 6)
+
+
+
+
+## Scale data based on all genes 
+gvhd_tcr <- ScaleData(gvhd_tcr, features = rownames(gvhd_tcr))
+
+## Perform  PCA based on the HVGs
+gvhd_tcr <- RunPCA(gvhd_tcr, features = seurat_hvg, npcs = 50)
+
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 1:2)
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 3:4)
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 5:6)
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 7:8)
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 9:10)
+DimPlot(gvhd_tcr, reduction = "pca", label = T, group.by = "timepoint", dims = 11:12)
+
+
+## Choose nPC based on stdev
+nPCs <- sum(gvhd_tcr[["pca"]]@stdev > n_pc_stdev)
+message(paste("nPCs:", nPCs, "\n"))
+write.table(nPCs, paste0(output_dir, "nPCs.txt"), sep = "\t", quote = F, row.names = F)
+
+## RunUMAP-function does not work
+gvhd_tcr <- RunUMAP(gvhd_tcr, dims = 1:nPCs)
+
+DimPlot(gvhd_tcr, reduction = "umap", label = T, group.by = "timepoint")
+DimPlot(gvhd_tcr, reduction = "umap", label = T)
+
+
+
+## Clustering
+res       <- c(seq(0.1, 1, 0.1), seq(1.2, 2, 0.2), 2.5, 3)
+gvhd_tcr  <- FindNeighbors(gvhd_tcr, reduction = "pca", dims = 1:nPCs)
+gvhd_tcr  <- FindClusters(object = gvhd_tcr, resolution = res)
+clustering_columns <- grep("res", colnames(gvhd_tcr@meta.data), value = T)
+
+
+
+## Plot clustering results
+p <- NULL
+i <- 1
+
+for(clustering_column in clustering_columns){
+  
+  message(clustering_column)
+  nColors <- gvhd_tcr@meta.data[,clustering_column] %>% levels %>% length
+  
+  p[[i]] <- DimPlot(gvhd_tcr, reduction = "umap", group.by = clustering_column, cols = getPalette(nColors), label = T) +
+    theme_classic() +
+    theme(legend.position = "none") +
+    labs(title = clustering_column)
+  i <- i + 1
+  
+}
+
+png("results/final_clusters/umap_per_clustering_column2.png", width = 1024, height = 1024)
+do.call(grid.arrange, c(p, ncol = 4))
+dev.off()
+
+
+q <- NULL
+i <- 1
+
+for(clustering_column in clustering_columns){
+  
+  message(clustering_column)
+  q[[i]] <- gvhd_tcr@meta.data[,clustering_column] %>% levels %>% length
+  i <- i + 1
+  
+}
+
+data.frame(res,q) %>% ggplot(aes(res,q,label=q)) + theme_bw() + labs(x = "res parameter", y = "nClusters") + geom_text()
+ggsave("results/final_clusters/scatter_res_per_cluster2.png", width = 4, height = 3)
+
+DimPlot(gvhd_tcr, reduction = "umap", group.by = "RNA_snn_res.0.3", cols = getPalette3(15), label = T)
+
+#### Decide clustering on res.0.4 as it agrees best with the latent umap and plateus
+Idents(gvhd_tcr) <- gvhd_tcr$RNA_snn_res.0.3

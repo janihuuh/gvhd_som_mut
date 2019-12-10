@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574285522121.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1D97C19",
+    "lastKnownWriteTime" : 1574285770,
+    "last_content_update" : 1574285770015,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/main.R",
+    "project_path" : "R/main.R",
+    "properties" : {
+        "cursorPosition" : "30,0",
+        "scrollLine" : "1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

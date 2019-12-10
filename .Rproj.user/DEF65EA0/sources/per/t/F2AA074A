@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574255348079.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "673842004",
+    "id" : "F2AA074A",
+    "lastKnownWriteTime" : 1575289929,
+    "last_content_update" : 1575289929779,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/clustering/run_plotClusters.R",
+    "project_path" : "R/clustering/run_plotClusters.R",
+    "properties" : {
+        "cursorPosition" : "159,0",
+        "scrollLine" : "146"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

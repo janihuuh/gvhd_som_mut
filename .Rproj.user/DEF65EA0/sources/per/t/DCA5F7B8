@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574246798712.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3021538249",
+    "id" : "DCA5F7B8",
+    "lastKnownWriteTime" : 1575290761,
+    "last_content_update" : 1575290868397,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/mutated_clonotype/run_mutatedClonotype.R",
+    "project_path" : "R/mutated_clonotype/run_mutatedClonotype.R",
+    "properties" : {
+        "cursorPosition" : "3,4",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

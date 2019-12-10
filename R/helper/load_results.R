@@ -1,0 +1,46 @@
+
+
+## Raw, no QC
+gvhd <- readRDS("results/gvhd_raw.rds")
+
+## New
+gvhd     <- readRDS("results/gvhd_fin.rds")
+cd4_tenx <- readRDS("results/cd4_tenx_seurat.rds")
+
+
+
+
+
+######################
+
+gvhd_old <- readRDS("results_old/gvhd_seurat.rds")
+gvhd_old <- UpdateSeuratObject(gvhd_old)
+
+write.table(VariableFeatures(gvhd_old), paste0(output_dir, "seurat_hvg_old.txt"), sep = "\t", quote = F, row.names = F)
+            
+
+
+hvg_df1 <- read.delim("/Users/janihuuh/Dropbox/gvhd_scrnaseq/results_old/dump/tcr_scran_mean_var_table.txt")
+hvg_df2 <- read.delim("/Users/janihuuh/Dropbox/lag3/old/old_scRNAseq/results_before_11_9_18/tcr_scran_mean_var_table.txt")
+
+dim(hvg_df1)
+dim(hvg_df2)
+
+hv.genes1 <- rownames(hvg_df1[order(hvg_df1$bio, decreasing = T), ])[1:3000]
+hv.genes2 <- rownames(hvg_df2[order(hvg_df2$bio, decreasing = T), ])[1:3000]
+
+hv.genes1 <- hv.genes1[!hv.genes1 %in% clonality_genes]
+hv.genes2 <- hv.genes2[!hv.genes2 %in% clonality_genes]
+
+intersect(hv.genes1, hv.genes2)
+
+
+table(substr(colnames(gvhd_old), 1, 4))
+
+
+
+###
+gvhd_old <- RunPCA(gvhd_old, features = hv.genes1, npcs = 50)
+gvhd_old <- RunUMAP(gvhd_old, dims = 1:50) 
+DimPlot(gvhd_old, reduction = "umap") #, label = T, group.by = "timepoint")
+

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574072512213.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2647045510",
+    "id" : "A2696244",
+    "lastKnownWriteTime" : 1574095312,
+    "last_content_update" : 1574095312386,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/preprocess/run_preprocessRNATCRab.R",
+    "project_path" : "R/preprocess/run_preprocessRNATCRab.R",
+    "properties" : {
+        "cursorPosition" : "34,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 13,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

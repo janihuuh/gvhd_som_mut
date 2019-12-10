@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575289943809.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3820509096",
+    "id" : "8FA028F8",
+    "lastKnownWriteTime" : 1575290250,
+    "last_content_update" : 1575290250992,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/clustering/run_hvg.R",
+    "project_path" : "R/clustering/run_hvg.R",
+    "properties" : {
+        "cursorPosition" : "117,0",
+        "scrollLine" : "107"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574066227183.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1609300241",
+    "id" : "DB50D246",
+    "lastKnownWriteTime" : 1574104731,
+    "last_content_update" : 1574104731366,
+    "path" : "~/Dropbox/gvhd_scrnaseq/src_manuscript/R/preprocess/run_preprocessTCRab.R",
+    "project_path" : "R/preprocess/run_preprocessTCRab.R",
+    "properties" : {
+        "cursorPosition" : "37,0",
+        "scrollLine" : "6",
+        "tempName" : "Untitled3"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 15,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

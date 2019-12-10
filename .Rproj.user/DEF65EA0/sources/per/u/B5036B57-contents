@@ -1,0 +1,80 @@
+
+dir.create("results/mutated_clonotype/", showWarnings = F)
+
+## Remove T cells with no TCR (as these could be from the clonotype!)
+
+########## Cluster 0 
+
+## Analyse the cluster 0, 1 and 3; i.e. the cluster with the mutatated clone
+gvhd_cytotoxic0 <- subset(gvhd, idents = 0)
+
+## Add meta.data and add as idents
+gvhd_cytotoxic0$big_clonotypes <- "other"
+gvhd_cytotoxic0$big_clonotypes[gvhd_cytotoxic$new_clonotypes_id %in% c("gvhd_clonotype1", "gvhd_clonotype2", "gvhd_clonotype3")] <- "clonotype"
+Idents(gvhd_cytotoxic0) <- as.factor(gvhd_cytotoxic0$big_clonotypes)
+
+## Test the differences
+cluster_markers0 <- FindAllMarkers(object = gvhd_cytotoxic0, only.pos = F, min.pct = 0.01, logfc.threshold = 1e-5, do.print = T, test.use = "t", return.thresh = 1) 
+cluster_markers0$direction <- ifelse(cluster_markers0$avg_logFC > 0, "up", "down")
+cluster_markers0 <- cluster_markers0 %>% filter(cluster == "clonotype")
+write.table(cluster_markers0, file = "results/mutated_clonotype/cluster0_markers_clonotype.txt", quote = F, row.names = F, sep = "\t")
+
+rnk0 <- data.frame(Name = cluster_markers0$gene, 
+                   metric = cluster_markers0$avg_logFC) %>% arrange(desc(metric))
+rnk0 <- rnk0[!rnk0$Name %in% clonality_genes, ]
+write.table(rnk0, file = "results/mutated_clonotype/cluster0_markers_clonotype_for_gsea.rnk", quote = F, row.names = F, sep = "\t")
+
+
+
+
+
+########## Cluster 1
+
+## Analyse the cluster 1, 1 and 3; i.e. the cluster with the mutatated clone
+gvhd_cytotoxic1 <- subset(gvhd, idents = 1)
+
+## Add meta.data and add as idents
+gvhd_cytotoxic1$big_clonotypes <- "other"
+gvhd_cytotoxic1$big_clonotypes[gvhd_cytotoxic$new_clonotypes_id %in% c("gvhd_clonotype1", "gvhd_clonotype2", "gvhd_clonotype3")] <- "clonotype"
+Idents(gvhd_cytotoxic1) <- as.factor(gvhd_cytotoxic1$big_clonotypes)
+
+## Test the differences
+cluster_markers1 <- FindAllMarkers(object = gvhd_cytotoxic1, only.pos = F, min.pct = 0.01, logfc.threshold = 1e-5, do.print = T, test.use = "t", return.thresh = 1) 
+cluster_markers1$direction <- ifelse(cluster_markers1$avg_logFC > 0, "up", "down")
+cluster_markers1 <- cluster_markers1 %>% filter(cluster == "clonotype")
+write.table(cluster_markers1, file = "results/mutated_clonotype/cluster1_markers_clonotype.txt", quote = F, row.names = F, sep = "\t")
+
+rnk1 <- data.frame(Name = cluster_markers1$gene, 
+                   metric = cluster_markers1$avg_logFC) %>% arrange(desc(metric))
+rnk1 <- rnk1[!rnk1$Name %in% clonality_genes, ]
+dim(rnk1)
+write.table(rnk1, file = "results/mutated_clonotype/cluster1_markers_clonotype_for_gsea.rnk", quote = F, row.names = F, sep = "\t")
+
+
+
+
+
+
+
+########## Cluster 3 
+
+## Analyse the cluster 3, 1 and 3; i.e. the cluster with the mutatated clone
+gvhd_cytotoxic3 <- subset(gvhd, idents = 3)
+
+## Add meta.data and add as idents
+gvhd_cytotoxic3$big_clonotypes <- "other"
+gvhd_cytotoxic3$big_clonotypes[gvhd_cytotoxic$new_clonotypes_id %in% c("gvhd_clonotype1", "gvhd_clonotype2", "gvhd_clonotype3")] <- "clonotype"
+Idents(gvhd_cytotoxic3) <- as.factor(gvhd_cytotoxic3$big_clonotypes)
+
+## Test the differences
+cluster_markers3 <- FindAllMarkers(object = gvhd_cytotoxic3, only.pos = F, min.pct = 0.01, logfc.threshold = 1e-5, do.print = T, test.use = "t", return.thresh = 1) 
+cluster_markers3$direction <- ifelse(cluster_markers3$avg_logFC > 0, "up", "down")
+cluster_markers3 <- cluster_markers3 %>% filter(cluster == "clonotype")
+write.table(cluster_markers3, file = "results/mutated_clonotype/cluster3_markers_clonotype.txt", quote = F, row.names = F, sep = "\t")
+
+rnk3 <- data.frame(Name = cluster_markers3$gene, 
+                   metric = cluster_markers3$avg_logFC) %>% arrange(desc(metric))
+rnk3 <- rnk3[!rnk3$Name %in% clonality_genes, ]
+write.table(rnk3, file = "results/mutated_clonotype/cluster3_markers_clonotype_for_gsea.rnk", quote = F, row.names = F, sep = "\t")
+
+
